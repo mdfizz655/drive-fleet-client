@@ -14,9 +14,9 @@ const AuthProvider = ({ children }) => {
     const createUser = (email, password) => { setLoading(true); return createUserWithEmailAndPassword(auth, email, password); }
     const signIn = (email, password) => { setLoading(true); return signInWithEmailAndPassword(auth, email, password); }
     const googleLogin = () => { setLoading(true); return signInWithPopup(auth, googleProvider); }
-    const logOut = async () => {
+    const logOut = () => {
         setLoading(true);
-        try { await axios.post(`${API_URL}/logout`, {}, { withCredentials: true }); } catch (e) {}
+        localStorage.removeItem('access-token'); // টোকেন মুছে ফেলা
         return signOut(auth);
     }
     const updateUserProfile = (name, photo) => { return updateProfile(auth.currentUser, { displayName: name, photoURL: photo }); }
@@ -25,10 +25,15 @@ const AuthProvider = ({ children }) => {
         const unsubscribe = onAuthStateChanged(auth, currentUser => {
             setUser(currentUser);
             if (currentUser?.email) {
-                axios.post(`${API_URL}/jwt`, { email: currentUser.email }, { withCredentials: true })
-                    .then(res => { if (res.data.success) setLoading(false); })
-                    .catch(() => setLoading(false));
+                axios.post(`${API_URL}/jwt`, { email: currentUser.email })
+                    .then(res => {
+                        if (res.data.token) {
+                            localStorage.setItem('access-token', res.data.token); // স্টোরেজে সেভ
+                            setLoading(false);
+                        }
+                    })
             } else {
+                localStorage.removeItem('access-token');
                 setLoading(false);
             }
         });
