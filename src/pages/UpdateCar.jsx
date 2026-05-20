@@ -9,7 +9,7 @@ const UpdateCar = () => {
   const [car, setCar] = useState(null);
 
   useEffect(() => {
-    axios.get(`https://drive-fleet-server-seven.vercel.app/car/${id}`)
+    axios.get(`https://drive-fleet-server.onrender.com/car/${id}`)
       .then(res => setCar(res.data));
   }, [id]);
 

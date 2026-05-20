@@ -10,7 +10,7 @@ const Home = () => {
 
   useEffect(() => {
     // ডাটাবেস থেকে সব গাড়ি আনা (সার্চ ছাড়া)
-    axios.get("https://drive-fleet-server-seven.vercel.app/cars")
+    axios.get("https://drive-fleet-server.onrender.com/cars")
       .then(res => {
         // রিকোয়ারমেন্ট অনুযায়ী শুধু প্রথম ৬টি গাড়ি দেখানো
         setCars(res.data.slice(0, 6));

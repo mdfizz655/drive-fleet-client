@@ -13,7 +13,7 @@ const CarDetails = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    axios.get(`https://drive-fleet-server-seven.vercel.app/car/${id}`)
+    axios.get(`drive-fleet-server.onrender.com/car/${id}`)
       .then(res => setCar(res.data));
   }, [id]);
 
@@ -39,7 +39,7 @@ const CarDetails = () => {
     };
 
     try {
-      const res = await axios.post("https://drive-fleet-server-seven.vercel.app/bookings", bookingInfo, { withCredentials: true });
+      const res = await axios.post("https://drive-fleet-server.onrender.com/bookings", bookingInfo, { withCredentials: true });
       if (res.data.insertedId) {
         toast.success("Car Booked Successfully!");
         setIsModalOpen(false);

@@ -13,7 +13,7 @@ const MyAddedCars = () => {
 
   useEffect(() => {
     if (user?.email) {
-      axios.get(`https://drive-fleet-server-seven.vercel.app/my-cars/${user.email}`, { withCredentials: true })
+      axios.get(`https://drive-fleet-server.onrender.com/my-cars/${user.email}`, { withCredentials: true })
         .then(res => {
           setMyCars(res.data);
           setLoading(false);
@@ -32,7 +32,7 @@ const MyAddedCars = () => {
       confirmButtonText: "Yes, delete it!"
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`https://drive-fleet-server-seven.vercel.app/car/${id}`, { withCredentials: true })
+        axios.delete(`https://drive-fleet-server.onrender.com/car/${id}`, { withCredentials: true })
           .then(res => {
             if (res.data.deletedCount > 0) {
               toast.success("Car deleted successfully!");
