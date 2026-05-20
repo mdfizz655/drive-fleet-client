@@ -11,10 +11,22 @@ const CarDetails = () => {
   const navigate = useNavigate();
   const [car, setCar] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // রেন্ডার সার্ভার লিঙ্ক
+  const API_URL = "https://drive-fleet-server.onrender.com";
 
   useEffect(() => {
-    axios.get(`drive-fleet-server.onrender.com/car/${id}`)
-      .then(res => setCar(res.data));
+    setLoading(true);
+    axios.get(`${API_URL}/car/${id}`)
+      .then(res => {
+        setCar(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching car details:", err);
+        setLoading(false);
+      });
   }, [id]);
 
   const handleBooking = async (e) => {
@@ -28,7 +40,7 @@ const CarDetails = () => {
     const bookingInfo = {
       carId: car._id,
       carName: car.name,
-      price: car.dailyPrice,
+      price: car.dailyPrice, // ডাটাবেসে যে নাম দিয়েছ সেটা নিশ্চিত করো
       image: car.image,
       userEmail: user?.email,
       userName: user?.displayName,
@@ -39,7 +51,7 @@ const CarDetails = () => {
     };
 
     try {
-      const res = await axios.post("https://drive-fleet-server.onrender.com/bookings", bookingInfo, { withCredentials: true });
+      const res = await axios.post(`${API_URL}/bookings`, bookingInfo, { withCredentials: true });
       if (res.data.insertedId) {
         toast.success("Car Booked Successfully!");
         setIsModalOpen(false);
@@ -50,70 +62,90 @@ const CarDetails = () => {
     }
   };
 
-  if (!car) return <div className="text-center py-20 font-bold">Loading Details...</div>;
+  if (loading) return <div className="text-center py-20 font-bold text-blue-600">Loading Details...</div>;
+  if (!car) return <div className="text-center py-20 font-bold text-red-500">Car not found!</div>;
 
   return (
     <div className="py-10 px-4 max-w-6xl mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <img src={car.image} alt={car.name} className="w-full h-[400px] object-cover rounded-[2rem] shadow-2xl" />
+        {/* Car Image */}
+        <div className="relative group">
+            <img 
+                src={car.image || "https://i.ibb.co/mJR9nkv/user.png"} 
+                alt={car.name} 
+                className="w-full h-[400px] object-cover rounded-[2rem] shadow-2xl border border-gray-100" 
+            />
+            <div className="absolute top-6 right-6 bg-blue-600 text-white px-4 py-1 rounded-full font-bold text-sm shadow-lg">
+                {car.type}
+            </div>
+        </div>
         
+        {/* Car Info */}
         <div className="space-y-6 text-left">
           <h1 className="text-4xl font-black text-gray-900">{car.name}</h1>
-          <p className="text-blue-600 font-bold bg-blue-50 w-fit px-4 py-1 rounded-full">{car.type}</p>
+          
           <div className="flex items-center gap-2 text-gray-500 font-bold">
-            <FaMapMarkerAlt className="text-blue-600" /> {car.location}
+            <FaMapMarkerAlt className="text-blue-600" /> {car.location || "Location not provided"}
           </div>
           
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-gray-100 p-4 rounded-2xl text-center">
-                <FaUserFriends className="mx-auto text-blue-600 mb-1" />
-                <p className="text-xs text-gray-400 font-bold">Seats</p>
-                <p className="font-bold">{car.capacity}</p>
+            <div className="bg-gray-50 p-4 rounded-2xl text-center border border-gray-100">
+                <FaUserFriends className="mx-auto text-blue-600 mb-1 text-xl" />
+                <p className="text-[10px] text-gray-400 font-bold uppercase">Seats</p>
+                <p className="font-bold text-gray-800">{car.capacity || "N/A"}</p>
             </div>
-            <div className="bg-gray-100 p-4 rounded-2xl text-center">
-                <FaCogs className="mx-auto text-blue-600 mb-1" />
-                <p className="text-xs text-gray-400 font-bold">Type</p>
-                <p className="font-bold">Auto</p>
+            <div className="bg-gray-50 p-4 rounded-2xl text-center border border-gray-100">
+                <FaCogs className="mx-auto text-blue-600 mb-1 text-xl" />
+                <p className="text-[10px] text-gray-400 font-bold uppercase">Type</p>
+                <p className="font-bold text-gray-800">Auto</p>
             </div>
-            <div className="bg-gray-100 p-4 rounded-2xl text-center">
-                <FaGasPump className="mx-auto text-blue-600 mb-1" />
-                <p className="text-xs text-gray-400 font-bold">Status</p>
-                <p className="font-bold">Ready</p>
+            <div className="bg-gray-50 p-4 rounded-2xl text-center border border-gray-100">
+                <FaGasPump className="mx-auto text-blue-600 mb-1 text-xl" />
+                <p className="text-[10px] text-gray-400 font-bold uppercase">Status</p>
+                <p className="font-bold text-gray-800">{car.availability || "Ready"}</p>
             </div>
           </div>
 
-          <p className="text-gray-600 leading-relaxed">{car.description}</p>
+          <div className="space-y-2">
+            <h3 className="font-bold text-gray-900 text-lg">Description</h3>
+            <p className="text-gray-600 leading-relaxed">{car.description || "No description available for this vehicle."}</p>
+          </div>
 
           <div className="pt-6 border-t flex justify-between items-center">
             <div>
-              <p className="text-2xl font-black text-blue-600">${car.dailyPrice}/day</p>
-              <p className="text-xs text-gray-400 font-bold">Bookings: {car.booking_count || 0}</p>
+              <p className="text-3xl font-black text-blue-600">${car.dailyPrice}<span className="text-sm text-gray-400">/day</span></p>
+              <p className="text-xs text-gray-400 font-bold">Total Bookings: {car.booking_count || 0}</p>
             </div>
-            <button onClick={() => setIsModalOpen(true)} className="bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all">Book Now</button>
+            <button 
+                onClick={() => setIsModalOpen(true)} 
+                className="bg-blue-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all transform active:scale-95"
+            >
+                Book Now
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Booking Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-          <div className="bg-white p-8 rounded-3xl w-full max-w-md shadow-2xl">
-            <h2 className="text-2xl font-bold mb-6 text-left">Confirm Your Booking</h2>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+          <div className="bg-white p-8 rounded-[2.5rem] w-full max-w-md shadow-2xl relative animate-in fade-in zoom-in duration-300">
+            <h2 className="text-2xl font-black mb-6 text-left text-gray-900">Confirm Booking</h2>
             <form onSubmit={handleBooking} className="space-y-4 text-left">
               <div>
-                <label className="block font-bold mb-1">Driver Needed?</label>
-                <select name="driver" className="w-full p-3 border rounded-xl">
-                  <option value="No">No, I'll drive</option>
+                <label className="block font-bold text-sm text-gray-700 mb-1">Driver Needed?</label>
+                <select name="driver" className="w-full p-3 border border-gray-200 rounded-xl outline-none focus:border-blue-500">
+                  <option value="No">No, I'll drive myself</option>
                   <option value="Yes">Yes, I need a driver</option>
                 </select>
               </div>
               <div>
-                <label className="block font-bold mb-1">Special Note</label>
-                <textarea name="note" rows="3" placeholder="Any special requests..." className="w-full p-3 border rounded-xl"></textarea>
+                <label className="block font-bold text-sm text-gray-700 mb-1">Special Note</label>
+                <textarea name="note" rows="3" placeholder="Any special requests or instructions..." className="w-full p-3 border border-gray-200 rounded-xl outline-none focus:border-blue-500"></textarea>
               </div>
-              <div className="flex gap-4">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 bg-gray-200 py-3 rounded-xl font-bold">Cancel</button>
-                <button type="submit" className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold">Confirm</button>
+              <div className="flex gap-4 pt-2">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200 transition-all">Cancel</button>
+                <button type="submit" className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all">Confirm</button>
               </div>
             </form>
           </div>
