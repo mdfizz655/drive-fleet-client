@@ -15,59 +15,39 @@ const MyAddedCars = () => {
   useEffect(() => {
     if (user?.email) {
       const token = localStorage.getItem('access-token');
-      axios.get(`${API_URL}/my-cars/${user.email}`, {
-        headers: { authorization: `Bearer ${token}` }
-      })
-      .then(res => {
-        setMyCars(res.data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      axios.get(`${API_URL}/my-cars/${user.email}`, { headers: { authorization: `Bearer ${token}` } })
+        .then(res => { setMyCars(res.data); setLoading(false); });
     }
   }, [user]);
 
   const handleDelete = (id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!"
-    }).then((result) => {
+    Swal.fire({ title: "Are you sure?", text: "Delete this car?", icon: "warning", showCancelButton: true, confirmButtonText: "Delete" }).then((result) => {
       if (result.isConfirmed) {
         const token = localStorage.getItem('access-token');
-        axios.delete(`${API_URL}/car/${id}`, {
-          headers: { authorization: `Bearer ${token}` }
-        })
-        .then(res => {
-          if (res.data.deletedCount > 0) {
-            toast.success("Car deleted!");
-            setMyCars(myCars.filter(car => car._id !== id));
-          }
-        });
+        axios.delete(`${API_URL}/cars/${id}`, { headers: { authorization: `Bearer ${token}` } })
+          .then(res => { if (res.data.deletedCount > 0) { toast.success("Deleted!"); setMyCars(myCars.filter(car => car._id !== id)); } });
       }
     });
   };
 
-  if (loading) return <div className="text-center py-20 font-bold text-blue-600">Loading...</div>;
+  if (loading) return <div className="text-center py-20 font-bold">Loading...</div>;
 
   return (
     <div className="py-10 px-4">
-      <h2 className="text-3xl font-black mb-8 text-left">My Listed Cars ({myCars.length})</h2>
+      <h2 className="text-3xl font-black mb-8 text-left text-gray-900">My Listed Cars</h2>
       <div className="overflow-x-auto bg-white rounded-2xl shadow-xl border">
         <table className="w-full text-left">
-          <thead className="bg-gray-100">
-            <tr><th className="p-4">Image</th><th className="p-4">Name</th><th className="p-4">Price/Day</th><th className="p-4 text-center">Actions</th></tr>
+          <thead className="bg-gray-100 font-bold">
+            <tr><th className="p-4">Image</th><th className="p-4">Name</th><th className="p-4 text-center">Actions</th></tr>
           </thead>
           <tbody>
             {myCars.map((car) => (
-              <tr key={car._id} className="border-b hover:bg-gray-50">
-                <td className="p-4"><img src={car.image} className="w-16 h-12 object-cover rounded-md" alt="" /></td>
+              <tr key={car._id} className="border-b">
+                <td className="p-4"><img src={car.image} className="w-16 h-12 object-cover rounded" /></td>
                 <td className="p-4 font-bold">{car.name}</td>
-                <td className="p-4 font-bold text-blue-600">${car.dailyPrice}</td>
                 <td className="p-4 flex justify-center gap-3">
-                  <Link to={`/update-car/${car._id}`} className="bg-blue-600 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1"><FaEdit /> EDIT</Link>
-                  <button onClick={() => handleDelete(car._id)} className="bg-red-500 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1"><FaTrashAlt /> DELETE</button>
+                  <Link to={`/update-car/${car._id}`} className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-xs"><FaEdit /> EDIT</Link>
+                  <button onClick={() => handleDelete(car._id)} className="bg-red-500 text-white px-4 py-2 rounded-lg font-bold text-xs"><FaTrashAlt /> DELETE</button>
                 </td>
               </tr>
             ))}
