@@ -36,7 +36,7 @@ const AuthProvider = ({ children }) => {
     const logOut = async () => {
         setLoading(true);
         try {
-            await axios.post('http://localhost:8000/logout', {}, { withCredentials: true });
+            await axios.post('https://drive-fleet-server-seven.vercel.app/logout', {}, { withCredentials: true });
         } catch (error) {
             console.error("Logout error", error);
         }
@@ -55,7 +55,7 @@ const AuthProvider = ({ children }) => {
             
             if (currentUser?.email) {
                 const userInfo = { email: currentUser.email };
-                axios.post('http://localhost:8000/jwt', userInfo, { withCredentials: true })
+                axios.post('https://drive-fleet-server-seven.vercel.app/jwt', userInfo, { withCredentials: true })
                     .then(res => {
                         if (res.data.success) {
                             setLoading(false);
@@ -63,7 +63,7 @@ const AuthProvider = ({ children }) => {
                     })
             } else {
                 // ইউজার না থাকলে কুকি পরিষ্কার করার চেষ্টা করা
-                axios.post('http://localhost:8000/logout', {}, { withCredentials: true })
+                axios.post('https://drive-fleet-server-seven.vercel.app/logout', {}, { withCredentials: true })
                     .then(() => {
                         setLoading(false);
                     })

@@ -9,7 +9,7 @@ const MyBookings = () => {
 
   useEffect(() => {
     if (user?.email) {
-      axios.get(`http://localhost:8000/my-bookings/${user.email}`, { withCredentials: true })
+      axios.get(`https://drive-fleet-server-seven.vercel.app/my-bookings/${user.email}`, { withCredentials: true })
         .then(res => {
           setBookings(res.data);
           setLoading(false);

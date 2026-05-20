@@ -12,7 +12,7 @@ const ExploreCars = () => {
   useEffect(() => {
     setLoading(true);
     // ডাটাবেস থেকে ডাটা আনা (সার্চ এবং ফিল্টার কুয়েরি সহ)
-    axios.get(`http://localhost:8000/cars?search=${searchTerm}&filter=${filterType}`)
+    axios.get(`https://drive-fleet-server-seven.vercel.app/cars?search=${searchTerm}&filter=${filterType}`)
       .then(res => {
         setCars(res.data);
         setLoading(false);

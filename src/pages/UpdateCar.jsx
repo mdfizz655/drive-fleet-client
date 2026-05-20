@@ -9,7 +9,7 @@ const UpdateCar = () => {
   const [car, setCar] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:8000/car/${id}`)
+    axios.get(`https://drive-fleet-server-seven.vercel.app/car/${id}`)
       .then(res => setCar(res.data));
   }, [id]);
 
@@ -26,7 +26,7 @@ const UpdateCar = () => {
     };
 
     try {
-      const res = await axios.put(`http://localhost:8000/car/${id}`, updatedData, { withCredentials: true });
+      const res = await axios.put(`https://drive-fleet-server-seven.vercel.app/car/${id}`, updatedData, { withCredentials: true });
       if (res.data.modifiedCount > 0) {
         toast.success("Car updated successfully!");
         navigate("/my-added-cars");
