@@ -10,7 +10,9 @@ const UpdateCar = () => {
   const API_URL = "https://drive-fleet-server.onrender.com";
 
   useEffect(() => {
-    axios.get(`${API_URL}/car/${id}`).then(res => setCar(res.data));
+    axios.get(`${API_URL}/car/${id}`)
+      .then(res => setCar(res.data))
+      .catch(err => console.log(err));
   }, [id]);
 
   const handleUpdate = async (e) => {
@@ -43,15 +45,17 @@ const UpdateCar = () => {
   return (
     <div className="py-10 max-w-2xl mx-auto px-4 text-left">
       <div className="bg-white p-8 rounded-[2rem] shadow-2xl border border-gray-50">
-        <h2 className="text-2xl font-black mb-6">Update Car: {car.name}</h2>
+        <h2 className="text-2xl font-black mb-6 text-gray-900">Update Car: {car.name}</h2>
         <form onSubmit={handleUpdate} className="space-y-4">
           <input type="text" name="name" defaultValue={car.name} className="w-full p-3 border rounded-xl" />
           <input type="number" name="price" defaultValue={car.dailyPrice} className="w-full p-3 border rounded-xl" />
-          <select name="type" defaultValue={car.type} className="w-full p-3 border rounded-xl"><option>SUV</option><option>Sedan</option><option>Hatchback</option><option>Luxury</option></select>
+          <select name="type" defaultValue={car.type} className="w-full p-3 border rounded-xl">
+             <option>SUV</option><option>Sedan</option><option>Hatchback</option><option>Luxury</option>
+          </select>
           <input type="text" name="location" defaultValue={car.location} className="w-full p-3 border rounded-xl" />
           <input type="text" name="image" defaultValue={car.image} className="w-full p-3 border rounded-xl" />
           <textarea name="desc" defaultValue={car.description} rows="3" className="w-full p-3 border rounded-xl"></textarea>
-          <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold">Update Vehicle</button>
+          <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 shadow-lg">Update Vehicle</button>
         </form>
       </div>
     </div>
