@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../providers/AuthProvider";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { FaUserFriends, FaMapMarkerAlt, FaCogs, FaGasPump } from "react-icons/fa";
 
 const CarDetails = () => {
   const { id } = useParams();
@@ -15,13 +16,18 @@ const CarDetails = () => {
   const API_URL = "https://drive-fleet-server.onrender.com";
 
   useEffect(() => {
-    axios.get(`${API_URL}/car/${id}`).then(res => { setCar(res.data); setLoading(false); });
+    setLoading(true);
+    // এখানে অবশ্যই /cars/ হবে
+    axios.get(`${API_URL}/cars/${id}`)
+      .then(res => { setCar(res.data); setLoading(false); })
+      .catch(() => setLoading(false));
   }, [id]);
 
   const handleBooking = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('access-token'); // টোকেন নাও
-    
+    if (!user) return navigate("/login");
+
+    const token = localStorage.getItem('access-token');
     const bookingInfo = {
       carId: car._id,
       carName: car.name,
@@ -35,28 +41,34 @@ const CarDetails = () => {
     };
 
     try {
-      const res = await axios.post("https://drive-fleet-server.onrender.com/bookings", bookingInfo, {
-        headers: { authorization: `Bearer ${token}` } // হেডার পাঠানো হচ্ছে 👈
+      const res = await axios.post(`${API_URL}/bookings`, bookingInfo, {
+        headers: { authorization: `Bearer ${token}` }
       });
       if (res.data.insertedId) {
-        toast.success("Car Booked Successfully!");
+        toast.success("Booked Successfully!");
         setIsModalOpen(false);
         navigate("/my-bookings");
       }
     } catch (err) {
-      toast.error("Error: Please login again.");
+      toast.error("Please login again.");
     }
-};
+  };
 
-  if (loading || !car) return <div className="text-center py-20 font-bold">Loading...</div>;
+  if (loading) return <div className="text-center py-20 font-bold">Loading...</div>;
+  if (!car) return <div className="text-center py-20 font-bold">Car not found!</div>;
 
   return (
     <div className="py-10 px-4 max-w-6xl mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 text-left">
         <img src={car.image} className="w-full h-[400px] object-cover rounded-[2rem] shadow-2xl" alt="" />
         <div className="space-y-6">
-          <h1 className="text-4xl font-black text-gray-900">{car.name}</h1>
-          <p className="text-gray-500 font-bold">{car.location}</p>
+          <h1 className="text-4xl font-black">{car.name}</h1>
+          <p className="flex items-center gap-2 text-gray-500 font-bold"><FaMapMarkerAlt /> {car.location}</p>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-gray-100 p-4 rounded-xl text-center"><FaUserFriends className="mx-auto text-blue-600" /><p className="font-bold">{car.capacity}</p></div>
+            <div className="bg-gray-100 p-4 rounded-xl text-center"><FaCogs className="mx-auto text-blue-600" /><p className="font-bold">Auto</p></div>
+            <div className="bg-gray-100 p-4 rounded-xl text-center"><FaGasPump className="mx-auto text-blue-600" /><p className="font-bold">Ready</p></div>
+          </div>
           <p className="text-gray-600">{car.description}</p>
           <div className="pt-6 border-t flex justify-between items-center">
             <p className="text-3xl font-black text-blue-600">${car.dailyPrice}/day</p>
@@ -66,8 +78,8 @@ const CarDetails = () => {
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-          <div className="bg-white p-8 rounded-[2.5rem] w-full max-w-md shadow-2xl">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white p-8 rounded-[2rem] w-full max-w-md shadow-2xl">
             <h2 className="text-2xl font-black mb-6">Confirm Booking</h2>
             <form onSubmit={handleBooking} className="space-y-4">
               <select name="driver" className="w-full p-3 border rounded-xl"><option value="No">No Driver</option><option value="Yes">Need Driver</option></select>
