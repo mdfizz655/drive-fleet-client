@@ -21,7 +21,8 @@ const MyAddedCars = () => {
       .then(res => {
         setMyCars(res.data);
         setLoading(false);
-      });
+      })
+      .catch(() => setLoading(false));
     }
   }, [user]);
 
@@ -48,7 +49,7 @@ const MyAddedCars = () => {
     });
   };
 
-  if (loading) return <div className="text-center py-20 font-bold">Loading...</div>;
+  if (loading) return <div className="text-center py-20 font-bold text-blue-600">Loading...</div>;
 
   return (
     <div className="py-10 px-4">
@@ -61,7 +62,7 @@ const MyAddedCars = () => {
           <tbody>
             {myCars.map((car) => (
               <tr key={car._id} className="border-b hover:bg-gray-50">
-                <td className="p-4"><img src={car.image} className="w-16 h-12 object-cover rounded-md" /></td>
+                <td className="p-4"><img src={car.image} className="w-16 h-12 object-cover rounded-md" alt="" /></td>
                 <td className="p-4 font-bold">{car.name}</td>
                 <td className="p-4 font-bold text-blue-600">${car.dailyPrice}</td>
                 <td className="p-4 flex justify-center gap-3">

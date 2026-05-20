@@ -12,12 +12,13 @@ const MyBookings = () => {
     if (user?.email) {
       const token = localStorage.getItem('access-token');
       axios.get(`${API_URL}/my-bookings/${user.email}`, {
-        headers: { authorization: `Bearer ${token}` } // হেডার যোগ করা হয়েছে
+        headers: { authorization: `Bearer ${token}` }
       })
       .then(res => {
         setBookings(res.data);
         setLoading(false);
-      });
+      })
+      .catch(() => setLoading(false));
     }
   }, [user]);
 
@@ -37,6 +38,7 @@ const MyBookings = () => {
           </div>
         ))}
       </div>
+      {bookings.length === 0 && <p className="text-center py-20 text-gray-400 italic">No bookings found.</p>}
     </div>
   );
 };

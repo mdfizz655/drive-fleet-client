@@ -20,7 +20,7 @@ const CarDetails = () => {
 
   const handleBooking = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('access-token'); // টোকেনটি নাও
+    const token = localStorage.getItem('access-token'); // টোকেন নাও
     
     const bookingInfo = {
       carId: car._id,
@@ -35,7 +35,7 @@ const CarDetails = () => {
     };
 
     try {
-      const res = await axios.post(`${API_URL}/bookings`, bookingInfo, {
+      const res = await axios.post("https://drive-fleet-server.onrender.com/bookings", bookingInfo, {
         headers: { authorization: `Bearer ${token}` } // হেডার পাঠানো হচ্ছে 👈
       });
       if (res.data.insertedId) {
@@ -46,7 +46,7 @@ const CarDetails = () => {
     } catch (err) {
       toast.error("Error: Please login again.");
     }
-  };
+};
 
   if (loading || !car) return <div className="text-center py-20 font-bold">Loading...</div>;
 
