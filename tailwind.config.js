@@ -7,5 +7,5 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [require("daisyui")], // এই লাইনটি নিশ্চিত করো
+  plugins: [require("daisyui")], 
 }
